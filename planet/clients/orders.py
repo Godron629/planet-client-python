@@ -22,7 +22,7 @@ import uuid
 
 from ._base import _BaseClient
 from .. import exceptions
-from ..models import Order, Orders, Request, Response, StreamingBody
+from ..models import Order, Orders, Response, StreamingBody
 
 
 STATS_PATH = 'compute/ops/stats/orders/v2/'
@@ -85,20 +85,6 @@ class OrdersClient(_BaseClient):
 
     def _bulk_url(self):
         return self.base_url + BULK_PATH
-
-    def _request(self, url, method, data=None, params=None, json=None):
-        return Request(url, method=method, data=data, params=params, json=json)
-
-    async def _do_request(
-        self,
-        request: Request
-    ) -> Response:
-        '''Submit a request and get response.
-
-        Parameters:
-            request: request to submit
-        '''
-        return await self._session.request(request)
 
     async def create_order(
         self,

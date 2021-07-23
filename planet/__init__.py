@@ -16,7 +16,7 @@ from .models import Order
 from . import order_request
 from .__version__ import __version__  # NOQA
 from .auth import Auth
-from .clients import OrdersClient
+from .clients import DataClient, OrdersClient
 
 
 __all__ = [
@@ -25,4 +25,5 @@ __all__ = [
     Order,
     order_request,
     Auth,
+    DataClient
 ]

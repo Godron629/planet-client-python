@@ -411,3 +411,29 @@ class Orders(Paged):
 
     async def __anext__(self):
         return Order(await super().__anext__())
+
+
+class Feature():
+    '''A feature returned from the Data API.'''
+
+    def __init__(self, data):
+        self.data = data
+
+    @property
+    def id(self):
+        return self.data['id']
+
+    @property
+    def json(self):
+        return self.data
+
+
+class Features(Paged):
+    '''Asynchronous iterator over Features from a paged response describing
+    data search results.'''
+    LINKS_KEY = '_links'
+    NEXT_KEY = '_next'
+    ITEMS_KEY = 'features'
+
+    async def __anext__(self):
+        return Feature(await super().__anext__())

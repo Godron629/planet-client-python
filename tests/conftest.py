@@ -53,6 +53,12 @@ def order_description():
 
 
 @pytest.fixture
+def feature_description():
+    filename = 'feature_description_LC80542392021182LGN00.json'
+    return _get_file_json(filename)
+
+
+@pytest.fixture
 def order_request():
     filename = 'order_details_psorthotile_analytic.json'
     return _get_file_json(filename)

@@ -1,0 +1,80 @@
+{
+    "_links": {
+        "_self": "https://api.planet.com/data/v1/item-types/Landsat8L1G/items/LC80542392021182LGN00",
+        "assets": "https://api.planet.com/data/v1/item-types/Landsat8L1G/items/LC80542392021182LGN00/assets/",
+        "thumbnail": "https://tiles.planet.com/data/v1/item-types/Landsat8L1G/items/LC80542392021182LGN00/thumb"
+    },
+    "_permissions": [
+        "assets.analytic_b1:download",
+        "assets.analytic_b10:download",
+        "assets.analytic_b11:download",
+        "assets.analytic_b2:download",
+        "assets.analytic_b3:download",
+        "assets.analytic_b4:download",
+        "assets.analytic_b5:download",
+        "assets.analytic_b6:download",
+        "assets.analytic_b7:download",
+        "assets.analytic_b8:download",
+        "assets.analytic_b9:download",
+        "assets.metadata_txt:download",
+        "assets.visual:download"
+    ],
+    "geometry": {
+        "coordinates": [
+            [
+                [
+                    -22.630634964077377,
+                    78.26289528430497
+                ],
+                [
+                    -17.7155117290747,
+                    76.8751545249624
+                ],
+                [
+                    -23.356224075698545,
+                    75.84027041302099
+                ],
+                [
+                    -28.466963916964147,
+                    77.12749285610747
+                ],
+                [
+                    -22.630634964077377,
+                    78.26289528430497
+                ]
+            ]
+        ],
+        "type": "Polygon"
+    },
+    "id": "LC80542392021182LGN00",
+    "properties": {
+        "acquired": "2021-07-01T21:09:33.54777Z",
+        "anomalous_pixels": 0.011,
+        "cloud_cover": 0.042,
+        "collection": "2",
+        "columns": 9091,
+        "data_type": "L1TP",
+        "epsg_code": 32627,
+        "gsd": 30,
+        "instrument": "OLI_TIRS",
+        "item_type": "Landsat8L1G",
+        "origin_x": 312285,
+        "origin_y": 8689515,
+        "pixel_resolution": 30,
+        "processed": "2021-07-08T08:31:53Z",
+        "product_id": "LC08_L1TP_054239_20210701_20210708_02_T1",
+        "provider": "usgs",
+        "published": "2021-07-08T13:09:40Z",
+        "quality_category": "standard",
+        "rows": 9101,
+        "satellite_id": "Landsat8",
+        "sun_azimuth": 297.7,
+        "sun_elevation": 17.4,
+        "updated": "2021-07-08T13:09:40Z",
+        "usable_data": 0.482,
+        "view_angle": 0,
+        "wrs_path": 54,
+        "wrs_row": 239
+    },
+    "type": "Feature"
+}
