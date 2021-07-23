@@ -20,15 +20,15 @@ import time
 import typing
 import uuid
 
-from .. import constants, exceptions
-from ..http import Session
+from ._base import _BaseClient
+from .. import exceptions
 from ..models import Order, Orders, Request, Response, StreamingBody
 
 
-BASE_URL = constants.PLANET_BASE_URL + 'compute/ops/'
-STATS_PATH = 'stats/orders/v2/'
-ORDERS_PATH = 'orders/v2/'
-BULK_PATH = 'bulk/orders/v2/'
+STATS_PATH = 'compute/ops/stats/orders/v2/'
+ORDERS_PATH = 'compute/ops/orders/v2/'
+BULK_PATH = 'compute/ops/bulk/orders/v2/'
+DOWNLOAD_PATH = 'download/'
 
 ORDERS_STATES_COMPLETE = ['success', 'partial', 'cancelled', 'failed']
 ORDERS_STATES_IN_PROGRESS = ['queued', 'running']
@@ -42,7 +42,7 @@ class OrdersClientException(Exception):
     pass
 
 
-class OrdersClient():
+class OrdersClient(_BaseClient):
     """High-level asynchronous access to Planet's orders API.
 
     Example:
@@ -62,22 +62,8 @@ class OrdersClient():
 
 
     """
-    def __init__(
-        self,
-        session: Session,
-        base_url: str = None
-    ):
-        """
-        Parameters:
-            session: Open session connected to server.
-            base_url: The base URL to use. Defaults to production orders API
-                base url.
-        """
-        self._session = session
-
-        self._base_url = base_url or BASE_URL
-        if not self._base_url.endswith('/'):
-            self._base_url += '/'
+    def _orders_url(self):
+        return self.base_url + ORDERS_PATH
 
     @staticmethod
     def _check_order_id(oid):
@@ -90,18 +76,15 @@ class OrdersClient():
         except ValueError:
             raise OrdersClientException(msg)
 
-    def _orders_url(self):
-        return self._base_url + ORDERS_PATH
-
     def _stats_url(self):
-        return self._base_url + STATS_PATH
+        return self.base_url + STATS_PATH
 
     def _order_url(self, order_id):
         self._check_order_id(order_id)
         return self._orders_url() + order_id
 
     def _bulk_url(self):
-        return self._base_url + BULK_PATH
+        return self.base_url + BULK_PATH
 
     def _request(self, url, method, data=None, params=None, json=None):
         return Request(url, method=method, data=data, params=params, json=json)

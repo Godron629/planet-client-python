@@ -27,7 +27,12 @@ import respx
 from planet import OrdersClient, clients, exceptions
 
 
-TEST_URL = 'http://MockNotRealURL/'
+TEST_BASE_URL = 'http://MockNotRealURL/'
+TEST_ORDERS_URL = TEST_BASE_URL + 'compute/ops/orders/v2/'
+TEST_STATS_URL = TEST_BASE_URL + 'compute/ops/stats/orders/v2/'
+TEST_BULK_URL = TEST_BASE_URL + 'compute/ops/bulk/orders/v2/'
+TEST_DOWNLOAD_URL = TEST_BASE_URL + 'download/'
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -52,7 +57,7 @@ def oid2():
 @respx.mock
 @pytest.mark.asyncio
 async def test_list_orders_basic(order_descriptions, session):
-    list_url = TEST_URL + 'orders/v2/'
+    list_url = TEST_ORDERS_URL
     next_page_url = list_url + 'blob/?page_marker=IAmATest'
 
     order1, order2, order3 = order_descriptions
@@ -74,7 +79,7 @@ async def test_list_orders_basic(order_descriptions, session):
     mock_resp2 = httpx.Response(HTTPStatus.OK, json=page2_response)
     respx.get(next_page_url).return_value = mock_resp2
 
-    cl = OrdersClient(session, base_url=TEST_URL)
+    cl = OrdersClient(session, base_url=TEST_BASE_URL)
     orders = await cl.list_orders()
 
     oids = list(o.id for o in orders)
@@ -84,7 +89,7 @@ async def test_list_orders_basic(order_descriptions, session):
 @respx.mock
 @pytest.mark.asyncio
 async def test_list_orders_state(order_descriptions, session):
-    list_url = TEST_URL + 'orders/v2/?state=failed'
+    list_url = TEST_ORDERS_URL + '?state=failed'
 
     order1, order2, _ = order_descriptions
 
@@ -97,7 +102,7 @@ async def test_list_orders_state(order_descriptions, session):
     mock_resp = httpx.Response(HTTPStatus.OK, json=page1_response)
     respx.get(list_url).return_value = mock_resp
 
-    cl = OrdersClient(session, base_url=TEST_URL)
+    cl = OrdersClient(session, base_url=TEST_BASE_URL)
     orders = await cl.list_orders(state='failed')
 
     oids = list(o.id for o in orders)
@@ -106,7 +111,7 @@ async def test_list_orders_state(order_descriptions, session):
 
 @pytest.mark.asyncio
 async def test_list_orders_state_invalid_state(session):
-    cl = OrdersClient(session, base_url=TEST_URL)
+    cl = OrdersClient(session, base_url=TEST_BASE_URL)
 
     with pytest.raises(clients.orders.OrdersClientException):
         _ = await cl.list_orders(state='invalidstate')
@@ -120,7 +125,7 @@ async def test_list_orders_limit(order_descriptions, session):
     # registering a response. if the client tries to get the next
     # page, an error will occur
 
-    list_url = TEST_URL + 'orders/v2/'
+    list_url = TEST_ORDERS_URL
     nono_page_url = list_url + '?page_marker=OhNoNo'
 
     order1, order2, order3 = order_descriptions
@@ -145,7 +150,7 @@ async def test_list_orders_limit(order_descriptions, session):
     nono_route = respx.route(method="GET", url__eq=nono_page_url).mock(
         return_value=mock_resp2)
 
-    cl = OrdersClient(session, base_url=TEST_URL)
+    cl = OrdersClient(session, base_url=TEST_BASE_URL)
     orders = await cl.list_orders(limit=1)
 
     assert not nono_route.called
@@ -156,8 +161,7 @@ async def test_list_orders_limit(order_descriptions, session):
 @respx.mock
 @pytest.mark.asyncio
 async def test_list_orders_asjson(order_descriptions, session):
-    list_url = TEST_URL + 'orders/v2/'
-
+    list_url = TEST_ORDERS_URL
     order1, order2, order3 = order_descriptions
 
     page1_response = {
@@ -167,7 +171,7 @@ async def test_list_orders_asjson(order_descriptions, session):
     mock_resp1 = httpx.Response(HTTPStatus.OK, json=page1_response)
     respx.get(list_url).return_value = mock_resp1
 
-    cl = OrdersClient(session, base_url=TEST_URL)
+    cl = OrdersClient(session, base_url=TEST_BASE_URL)
     orders = await cl.list_orders(as_json=True)
     assert orders[0]['id'] == 'oid1'
 
@@ -175,11 +179,11 @@ async def test_list_orders_asjson(order_descriptions, session):
 @respx.mock
 @pytest.mark.asyncio
 async def test_create_order(oid, order_description, order_request, session):
-    create_url = TEST_URL + 'orders/v2/'
+    create_url = TEST_ORDERS_URL
     mock_resp = httpx.Response(HTTPStatus.OK, json=order_description)
     respx.post(create_url).return_value = mock_resp
 
-    cl = OrdersClient(session, base_url=TEST_URL)
+    cl = OrdersClient(session, base_url=TEST_BASE_URL)
     order = await cl.create_order(order_request)
 
     assert order.json == order_description
@@ -188,7 +192,7 @@ async def test_create_order(oid, order_description, order_request, session):
 @respx.mock
 @pytest.mark.asyncio
 async def test_create_order_bad_item_type(order_request, session):
-    create_url = TEST_URL + 'orders/v2/'
+    create_url = TEST_ORDERS_URL
 
     resp = {
         "field": {
@@ -208,7 +212,7 @@ async def test_create_order_bad_item_type(order_request, session):
     mock_resp = httpx.Response(400, json=resp)
     respx.post(create_url).return_value = mock_resp
     order_request['products'][0]['item_type'] = 'invalid'
-    cl = OrdersClient(session, base_url=TEST_URL)
+    cl = OrdersClient(session, base_url=TEST_BASE_URL)
 
     expected_msg = (
         "Unable to accept order - Bad item type 'invalid' for bundle type " +
@@ -222,7 +226,7 @@ async def test_create_order_bad_item_type(order_request, session):
 @pytest.mark.asyncio
 async def test_create_order_item_id_does_not_exist(
         order_request, session, match_pytest_raises):
-    create_url = TEST_URL + 'orders/v2/'
+    create_url = TEST_ORDERS_URL
 
     resp = {
         "field": {
@@ -243,7 +247,7 @@ async def test_create_order_item_id_does_not_exist(
     respx.post(create_url).return_value = mock_resp
     order_request['products'][0]['item_ids'] = \
         '4500474_2133707_2021-05-20_2419'
-    cl = OrdersClient(session, base_url=TEST_URL)
+    cl = OrdersClient(session, base_url=TEST_BASE_URL)
 
     expected_msg = (
         "Unable to accept order - Item ID 4500474_2133707_2021-05-20_2419 " +
@@ -256,11 +260,11 @@ async def test_create_order_item_id_does_not_exist(
 @respx.mock
 @pytest.mark.asyncio
 async def test_get_order(oid, order_description, session):
-    get_url = TEST_URL + 'orders/v2/' + oid
+    get_url = TEST_ORDERS_URL + oid
     mock_resp = httpx.Response(HTTPStatus.OK, json=order_description)
     respx.get(get_url).return_value = mock_resp
 
-    cl = OrdersClient(session, base_url=TEST_URL)
+    cl = OrdersClient(session, base_url=TEST_BASE_URL)
     order = await cl.get_order(oid)
 
     assert order.state == 'queued'
@@ -268,7 +272,7 @@ async def test_get_order(oid, order_description, session):
 
 @pytest.mark.asyncio
 async def test_get_order_invalid_id(session):
-    cl = OrdersClient(session, base_url=TEST_URL)
+    cl = OrdersClient(session, base_url=TEST_BASE_URL)
     with pytest.raises(clients.orders.OrdersClientException):
         _ = await cl.get_order('-')
 
@@ -277,7 +281,7 @@ async def test_get_order_invalid_id(session):
 @pytest.mark.asyncio
 async def test_get_order_id_doesnt_exist(
         oid, session, match_pytest_raises):
-    get_url = TEST_URL + 'orders/v2/' + oid
+    get_url = TEST_ORDERS_URL + oid
 
     msg = f'Could not load order ID: {oid}.'
     resp = {
@@ -286,7 +290,7 @@ async def test_get_order_id_doesnt_exist(
     mock_resp = httpx.Response(404, json=resp)
     respx.get(get_url).return_value = mock_resp
 
-    cl = OrdersClient(session, base_url=TEST_URL)
+    cl = OrdersClient(session, base_url=TEST_BASE_URL)
 
     with match_pytest_raises(exceptions.MissingResource, msg):
         _ = await cl.get_order(oid)
@@ -295,20 +299,20 @@ async def test_get_order_id_doesnt_exist(
 @respx.mock
 @pytest.mark.asyncio
 async def test_cancel_order(oid, order_description, session):
-    cancel_url = TEST_URL + 'orders/v2/' + oid
+    cancel_url = TEST_ORDERS_URL + oid
     order_description['state'] = 'cancelled'
     mock_resp = httpx.Response(HTTPStatus.OK, json=order_description)
     respx.put(cancel_url).return_value = mock_resp
 
     # TODO: the api says cancel order returns the order details but as
     # far as I can test thus far, it returns nothing. follow up on this
-    cl = OrdersClient(session, base_url=TEST_URL)
+    cl = OrdersClient(session, base_url=TEST_BASE_URL)
     await cl.cancel_order(oid)
 
 
 @pytest.mark.asyncio
 async def test_cancel_order_invalid_id(session):
-    cl = OrdersClient(session, base_url=TEST_URL)
+    cl = OrdersClient(session, base_url=TEST_BASE_URL)
     with pytest.raises(clients.orders.OrdersClientException):
         _ = await cl.cancel_order('invalid_order_id')
 
@@ -317,7 +321,7 @@ async def test_cancel_order_invalid_id(session):
 @pytest.mark.asyncio
 async def test_cancel_order_id_doesnt_exist(
         oid, session, match_pytest_raises):
-    cancel_url = TEST_URL + 'orders/v2/' + oid
+    cancel_url = TEST_ORDERS_URL + oid
 
     msg = f'No such order ID: {oid}.'
     resp = {
@@ -326,7 +330,7 @@ async def test_cancel_order_id_doesnt_exist(
     mock_resp = httpx.Response(404, json=resp)
     respx.put(cancel_url).return_value = mock_resp
 
-    cl = OrdersClient(session, base_url=TEST_URL)
+    cl = OrdersClient(session, base_url=TEST_BASE_URL)
 
     with match_pytest_raises(exceptions.MissingResource, msg):
         _ = await cl.cancel_order(oid)
@@ -336,7 +340,7 @@ async def test_cancel_order_id_doesnt_exist(
 @pytest.mark.asyncio
 async def test_cancel_order_id_cannot_be_cancelled(
         oid, session, match_pytest_raises):
-    cancel_url = TEST_URL + 'orders/v2/' + oid
+    cancel_url = TEST_ORDERS_URL + oid
 
     msg = 'Order not in a cancellable state'
     resp = {
@@ -345,7 +349,7 @@ async def test_cancel_order_id_cannot_be_cancelled(
     mock_resp = httpx.Response(409, json=resp)
     respx.put(cancel_url).return_value = mock_resp
 
-    cl = OrdersClient(session, base_url=TEST_URL)
+    cl = OrdersClient(session, base_url=TEST_BASE_URL)
 
     with match_pytest_raises(exceptions.Conflict, msg):
         _ = await cl.cancel_order(oid)
@@ -354,7 +358,7 @@ async def test_cancel_order_id_cannot_be_cancelled(
 @respx.mock
 @pytest.mark.asyncio
 async def test_cancel_orders_by_ids(session, oid, oid2):
-    bulk_cancel_url = TEST_URL + 'bulk/orders/v2/cancel'
+    bulk_cancel_url = TEST_BULK_URL + 'cancel'
     test_ids = [oid, oid2]
     example_result = {
         "result": {
@@ -373,7 +377,7 @@ async def test_cancel_orders_by_ids(session, oid, oid2):
     mock_resp = httpx.Response(HTTPStatus.OK, json=example_result)
     respx.post(bulk_cancel_url).return_value = mock_resp
 
-    cl = OrdersClient(session, base_url=TEST_URL)
+    cl = OrdersClient(session, base_url=TEST_BASE_URL)
     res = await cl.cancel_orders(test_ids)
 
     assert res == example_result
@@ -387,7 +391,7 @@ async def test_cancel_orders_by_ids(session, oid, oid2):
 
 @pytest.mark.asyncio
 async def test_cancel_orders_by_ids_invalid_id(session, oid):
-    cl = OrdersClient(session, base_url=TEST_URL)
+    cl = OrdersClient(session, base_url=TEST_BASE_URL)
     with pytest.raises(clients.orders.OrdersClientException):
         _ = await cl.cancel_orders([oid, "invalid_oid"])
 
@@ -395,7 +399,7 @@ async def test_cancel_orders_by_ids_invalid_id(session, oid):
 @respx.mock
 @pytest.mark.asyncio
 async def test_cancel_orders_all(session):
-    bulk_cancel_url = TEST_URL + 'bulk/orders/v2/cancel'
+    bulk_cancel_url = TEST_BULK_URL + 'cancel'
 
     example_result = {
         "result": {
@@ -409,7 +413,7 @@ async def test_cancel_orders_all(session):
     mock_resp = httpx.Response(HTTPStatus.OK, json=example_result)
     respx.post(bulk_cancel_url).return_value = mock_resp
 
-    cl = OrdersClient(session, base_url=TEST_URL)
+    cl = OrdersClient(session, base_url=TEST_BASE_URL)
     res = await cl.cancel_orders()
 
     assert res == example_result
@@ -421,14 +425,14 @@ async def test_cancel_orders_all(session):
 @respx.mock
 @pytest.mark.asyncio
 async def test_poll(oid, order_description, session):
-    get_url = TEST_URL + 'orders/v2/' + oid
+    get_url = TEST_ORDERS_URL + oid
 
     order_description2 = copy.deepcopy(order_description)
     order_description2['state'] = 'running'
     order_description3 = copy.deepcopy(order_description)
     order_description3['state'] = 'success'
 
-    cl = OrdersClient(session, base_url=TEST_URL)
+    cl = OrdersClient(session, base_url=TEST_BASE_URL)
 
     route = respx.get(get_url)
     route.side_effect = [
@@ -451,14 +455,14 @@ async def test_poll(oid, order_description, session):
 
 @pytest.mark.asyncio
 async def test_poll_invalid_oid(session):
-    cl = OrdersClient(session, base_url=TEST_URL)
+    cl = OrdersClient(session, base_url=TEST_BASE_URL)
     with pytest.raises(clients.orders.OrdersClientException):
         _ = await cl.poll("invalid_oid", wait=0)
 
 
 @pytest.mark.asyncio
 async def test_poll_invalid_state(oid, session):
-    cl = OrdersClient(session, base_url=TEST_URL)
+    cl = OrdersClient(session, base_url=TEST_BASE_URL)
     with pytest.raises(clients.orders.OrdersClientException):
         _ = await cl.poll(oid, state="invalid_state", wait=0)
 
@@ -466,7 +470,7 @@ async def test_poll_invalid_state(oid, session):
 @respx.mock
 @pytest.mark.asyncio
 async def test_aggegated_order_stats(session):
-    stats_url = TEST_URL + 'stats/orders/v2/'
+    stats_url = TEST_STATS_URL
     LOGGER.debug(f'url: {stats_url}')
     example_stats = {
         "organization": {
@@ -481,7 +485,7 @@ async def test_aggegated_order_stats(session):
     mock_resp = httpx.Response(HTTPStatus.OK, json=example_stats)
     respx.get(stats_url).return_value = mock_resp
 
-    cl = OrdersClient(session, base_url=TEST_URL)
+    cl = OrdersClient(session, base_url=TEST_BASE_URL)
     res = await cl.aggregated_order_stats()
 
     assert res == example_stats
@@ -490,7 +494,7 @@ async def test_aggegated_order_stats(session):
 @respx.mock
 @pytest.mark.asyncio
 async def test_download_asset_md(tmpdir, session):
-    dl_url = TEST_URL + 'download/?token=IAmAToken'
+    dl_url = TEST_DOWNLOAD_URL + '?token=IAmAToken'
 
     md_json = {'key': 'value'}
     md_headers = {
@@ -500,7 +504,7 @@ async def test_download_asset_md(tmpdir, session):
     mock_resp = httpx.Response(HTTPStatus.OK, json=md_json, headers=md_headers)
     respx.get(dl_url).return_value = mock_resp
 
-    cl = OrdersClient(session, base_url=TEST_URL)
+    cl = OrdersClient(session, base_url=TEST_BASE_URL)
     filename = await cl.download_asset(dl_url, directory=str(tmpdir))
 
     assert json.loads(open(filename).read()) == {'key': 'value'}
@@ -510,7 +514,7 @@ async def test_download_asset_md(tmpdir, session):
 @respx.mock
 @pytest.mark.asyncio
 async def test_download_asset_img(tmpdir, open_test_img, session):
-    dl_url = TEST_URL + 'download/?token=IAmAToken'
+    dl_url = TEST_DOWNLOAD_URL + '?token=IAmAToken'
 
     img_headers = {
         'Content-Type': 'image/tiff',
@@ -534,7 +538,7 @@ async def test_download_asset_img(tmpdir, open_test_img, session):
                                request='donotcloneme')
     respx.get(dl_url).return_value = mock_resp
 
-    cl = OrdersClient(session, base_url=TEST_URL)
+    cl = OrdersClient(session, base_url=TEST_BASE_URL)
     filename = await cl.download_asset(dl_url, directory=str(tmpdir))
 
     assert Path(filename).name == 'img.tif'
@@ -544,14 +548,14 @@ async def test_download_asset_img(tmpdir, open_test_img, session):
 @respx.mock
 @pytest.mark.asyncio
 async def test_download_order(tmpdir, order_description, oid, session):
-    dl_url1 = TEST_URL + 'download/1?token=IAmAToken'
-    dl_url2 = TEST_URL + 'download/2?token=IAmAnotherToken'
+    dl_url1 = TEST_DOWNLOAD_URL + '1?token=IAmAToken'
+    dl_url2 = TEST_DOWNLOAD_URL + '2?token=IAmAnotherToken'
     order_description['_links']['results'] = [
         {'location': dl_url1},
         {'location': dl_url2}
     ]
 
-    get_url = TEST_URL + 'orders/v2/' + oid
+    get_url = TEST_ORDERS_URL + oid
     mock_resp = httpx.Response(HTTPStatus.OK, json=order_description)
     respx.get(get_url).return_value = mock_resp
 
@@ -573,7 +577,7 @@ async def test_download_order(tmpdir, order_description, oid, session):
         })
     respx.get(dl_url2).return_value = mock_resp1
 
-    cl = OrdersClient(session, base_url=TEST_URL)
+    cl = OrdersClient(session, base_url=TEST_BASE_URL)
     filenames = await cl.download_order(oid, directory=str(tmpdir))
 
     assert len(filenames) == 2
