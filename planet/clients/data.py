@@ -18,7 +18,7 @@ import typing
 
 from ._base import _BaseClient
 from .. import exceptions
-from ..models import Feature, Features
+from ..models import Items, Item
 
 LOGGER = logging.getLogger(__name__)
 
@@ -55,8 +55,9 @@ class DataClient(_BaseClient):
         sort: str = None,
         strict: bool = None,
         limit: int = None
-    ) -> typing.List[Feature]:
+    ) -> typing.List[Item]:
         '''Execute a structured item search.
+
         Parameters:
             filter: Structured search criteria.
             item_types: The item types to include in the search.
@@ -88,5 +89,6 @@ class DataClient(_BaseClient):
             return resp
 
         req = self._request(url, method='POST', data=search_body)
-        features = Features(req, _request_and_parse, limit=limit)
-        return [f async for f in features]
+        items = Items(req, _request_and_parse, limit=limit)
+
+        return [i async for i in items]

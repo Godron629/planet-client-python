@@ -343,12 +343,26 @@ class Paged():
         return next_link
 
 
-class Order():
-    '''Managing description of an order returned from Orders API.
+class JSONBody():
+    '''A representation of a json resource from the API.'''
+    def __init__(
+        self,
+        data: dict
+    ):
+        '''Initialize object
 
-    :param data: Response json describing order
-    :type data: dict
-    '''
+        Parameters:
+            data: Response json describing body
+        '''
+        self.data = data
+
+    @property
+    def json(self):
+        return self.data
+
+
+class Order(JSONBody):
+    '''Managing description of an order returned from Orders API.'''
     LINKS_KEY = '_links'
     RESULTS_KEY = 'results'
     LOCATION_KEY = 'location'
@@ -397,10 +411,6 @@ class Order():
         '''
         return self.data['id']
 
-    @property
-    def json(self):
-        return self.data
-
 
 class Orders(Paged):
     '''Asynchronous iterator over Orders from a paged response describing
@@ -413,27 +423,23 @@ class Orders(Paged):
         return Order(await super().__anext__())
 
 
-class Feature():
-    '''A feature returned from the Data API.'''
-
-    def __init__(self, data):
-        self.data = data
-
+class Item(JSONBody):
+    '''An item returned from the Data API.'''
     @property
     def id(self):
         return self.data['id']
 
     @property
-    def json(self):
-        return self.data
+    def type(self):
+        return self.data['properties']['item_type']
 
 
-class Features(Paged):
-    '''Asynchronous iterator over Features from a paged response describing
+class Items(Paged):
+    '''Asynchronous iterator over Items from a paged response describing
     data search results.'''
     LINKS_KEY = '_links'
     NEXT_KEY = '_next'
     ITEMS_KEY = 'features'
 
     async def __anext__(self):
-        return Feature(await super().__anext__())
+        return Item(await super().__anext__())
