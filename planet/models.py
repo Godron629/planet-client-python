@@ -356,6 +356,9 @@ class JSONBody():
         '''
         self.data = data
 
+    def __repr__(self):
+        return self.json.__repr__()
+
     @property
     def json(self):
         return self.data
@@ -443,3 +446,19 @@ class Items(Paged):
 
     async def __anext__(self):
         return Item(await super().__anext__())
+
+
+class Asset(JSONBody):
+    '''An asset returned from the Data API.'''
+    @property
+    def status(self) -> str:
+        '''Status of the asset.'''
+        return self.data['status']
+
+    @property
+    def activate_url(self):
+        return self.data['_links']['activate']
+
+    @property
+    def location(self):
+        return self.data['location']

@@ -14,6 +14,7 @@
 import copy
 from http import HTTPStatus
 import logging
+from unittest.mock import MagicMock
 
 import httpx
 import pytest
@@ -110,3 +111,102 @@ async def test_DataClient_quick_search_bad_item_type(
 
     with match_pytest_raises(exceptions.BadQuery, msg):
         _ = await cl.quick_search(cloud_filter, item_types)
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_DataClient_get_assets(session):
+    item = MagicMock()
+    item.type = 'itemtype'
+    item.id = 'itemid'
+
+    assets_url = TEST_URL + 'data/v1/item-types/itemtype/items/itemid'
+
+    assets = {
+        "analytic": {
+            "_links": {
+                "_self": "selfurl",
+                "activate": "activateurl",
+                "type": "https://api.planet.com/data/v1/asset-types/analytic"
+            },
+            "_permissions": ["download"],
+            "expires_at": "2021-08-06T01:03:31.182143",
+            "location": "downloadurl",
+            "md5_digest": "1fb0e331c05a52d5eb847d6fc018320d",
+            "status": "active",
+            "type": "analytic"
+        },
+        "analytic_5b": {
+            "_links": {
+                "_self": "selfurl",
+                "activate": "activateurl",
+                "type": "https://api.planet.com/data/v1/asset-types/analytic_5b" # noqa
+            },
+            "_permissions": ["download"],
+            "md5_digest": None,
+            "status": "inactive",
+            "type": "analytic_5b"
+          }
+    }
+    mock_resp = httpx.Response(HTTPStatus.OK, json=assets)
+    respx.get(assets_url).return_value = mock_resp
+
+    cl = DataClient(session, base_url=TEST_URL)
+    assets = await cl.get_assets(item)
+
+    assert assets[0].status == 'active'
+    assert assets[1].status == 'inactive'
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_DataClient_get_assets_bad_type(session, match_pytest_raises):
+    item = MagicMock()
+    item.type = 'baditemtype'
+    item.id = 'itemid'
+
+    assets_url = TEST_URL + 'data/v1/item-types/baditemtype/items/itemid'
+
+    msg = "The requested item type does not exist."
+    resp = {
+        "general": [
+            {
+                "message": msg
+            }
+        ],
+        "field": {}
+    }
+    mock_resp = httpx.Response(404, json=resp)
+    respx.get(assets_url).return_value = mock_resp
+
+    cl = DataClient(session, base_url=TEST_URL)
+
+    with match_pytest_raises(exceptions.MissingResource, msg):
+        _ = await cl.get_assets(item)
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_DataClient_get_assets_bad_id(session, match_pytest_raises):
+    item = MagicMock()
+    item.type = 'itemtype'
+    item.id = 'baditemid'
+
+    assets_url = TEST_URL + 'data/v1/item-types/itemtype/items/baditemid'
+
+    msg = "Could not find the requested item."
+    resp = {
+        "general": [
+            {
+                "message": msg
+            }
+        ],
+        "field": {}
+    }
+    mock_resp = httpx.Response(404, json=resp)
+    respx.get(assets_url).return_value = mock_resp
+
+    cl = DataClient(session, base_url=TEST_URL)
+
+    with match_pytest_raises(exceptions.MissingResource, msg):
+        _ = await cl.get_assets(item)

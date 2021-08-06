@@ -229,3 +229,45 @@ def test_Order_locations(order_description):
     order = models.Order(order_description)
     expected_locations = ['location1', 'location2', 'location3']
     assert order.locations == expected_locations
+
+
+@pytest.fixture
+def get_items_pages(items_page):
+    page2 = copy.deepcopy(items_page)
+    del page2['_links']['_next']
+    responses = [
+        mock_http_response(json=items_page),
+        mock_http_response(json=page2)
+    ]
+
+    async def do_get(req):
+        return responses.pop(0)
+
+    return do_get
+
+
+@pytest.mark.asyncio
+async def test_Items(get_items_pages):
+    req = MagicMock()
+    items = models.Items(req, get_items_pages)
+    expected_ids = [
+        'LC81770382021196LGN00',
+        'LC81450232021196LGN00',
+        'LC81770382021196LGN00',
+        'LC81450232021196LGN00'
+    ]
+    assert expected_ids == [i.id async for i in items]
+
+
+def test_Item(item_description):
+    item = models.Item(item_description)
+    assert item.id == 'LC81770382021196LGN00'
+    assert item.type == 'Landsat8L1G'
+
+
+def test_Asset(assets_page):
+    analytic = models.Asset(assets_page['analytic'])
+    visual = models.Asset(assets_page['visual'])
+
+    assert analytic.status == 'active'
+    assert visual.status == 'inactive'

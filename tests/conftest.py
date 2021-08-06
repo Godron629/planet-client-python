@@ -71,6 +71,23 @@ def orders_page():
 
 
 @pytest.fixture
+def items_page():
+    filename = 'items_page.json'
+    return _get_file_json(filename)
+
+
+@pytest.fixture
+def item_description(items_page):
+    return items_page['features'][0]
+
+
+@pytest.fixture
+def assets_page():
+    filename = 'assets_page.json'
+    return _get_file_json(filename)
+
+
+@pytest.fixture
 def oid():
     return 'b0cb3448-0a74-11eb-92a1-a3d779bb08e0'
 

@@ -1,0 +1,170 @@
+{
+  "_links": {
+    "_first": "https://api.planet.com/data/v1/searches/d37db6a560744e1499fae2e70905ac0e/results?_page=eyJwYWdlX3NpemUiOiAyNTAsICJzb3J0X2J5IjogInB1Ymxpc2hlZCIsICJzb3J0X2Rlc2MiOiB0cnVlLCAic29ydF9zdGFydCI6IG51bGwsICJzb3J0X2xhc3RfaWQiOiBudWxsLCAic29ydF9wcmV2IjogZmFsc2UsICJxdWVyeV9wYXJhbXMiOiB7fX0%3D",
+    "_next": "https://api.planet.com/data/v1/searches/d37db6a560744e1499fae2e70905ac0e/results?_page=eyJwYWdlX3NpemUiOiAyNTAsICJzb3J0X2J5IjogInB1Ymxpc2hlZCIsICJzb3J0X2Rlc2MiOiB0cnVlLCAic29ydF9zdGFydCI6ICIyMDIxLTA3LTIxVDEyOjU4OjA3LjAwMDAwMFoiLCAic29ydF9sYXN0X2lkIjogIkxDODE4NDAzMTIwMjExOTdMR04wMCIsICJzb3J0X3ByZXYiOiBmYWxzZSwgInF1ZXJ5X3BhcmFtcyI6IHt9fQ%3D%3D",
+    "_self": "https://api.planet.com/data/v1/searches/d37db6a560744e1499fae2e70905ac0e/results?_page=eyJwYWdlX3NpemUiOiAyNTAsICJzb3J0X2J5IjogInB1Ymxpc2hlZCIsICJzb3J0X2Rlc2MiOiB0cnVlLCAic29ydF9zdGFydCI6IG51bGwsICJzb3J0X2xhc3RfaWQiOiBudWxsLCAic29ydF9wcmV2IjogZmFsc2UsICJxdWVyeV9wYXJhbXMiOiB7fX0%3D"
+  },
+  "features": [
+    {
+      "_links": {
+        "_self": "https://api.planet.com/data/v1/item-types/Landsat8L1G/items/LC81770382021196LGN00",
+        "assets": "https://api.planet.com/data/v1/item-types/Landsat8L1G/items/LC81770382021196LGN00/assets/",
+        "thumbnail": "https://tiles.planet.com/data/v1/item-types/Landsat8L1G/items/LC81770382021196LGN00/thumb"
+      },
+      "_permissions": [
+        "assets.analytic_b1:download",
+        "assets.analytic_b10:download",
+        "assets.analytic_b11:download",
+        "assets.analytic_b2:download",
+        "assets.analytic_b3:download",
+        "assets.analytic_b4:download",
+        "assets.analytic_b5:download",
+        "assets.analytic_b6:download",
+        "assets.analytic_b7:download",
+        "assets.analytic_b8:download",
+        "assets.analytic_b9:download",
+        "assets.metadata_txt:download",
+        "assets.visual:download"
+      ],
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              30.059090330606697,
+              32.787368629553036
+            ],
+            [
+              31.990519713498028,
+              32.41112031569551
+            ],
+            [
+              31.508438872990837,
+              30.686470644843723
+            ],
+            [
+              29.613252962745243,
+              31.063079485856832
+            ],
+            [
+              30.059090330606697,
+              32.787368629553036
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "id": "LC81770382021196LGN00",
+      "properties": {
+        "acquired": "2021-07-15T08:29:33.160008Z",
+        "anomalous_pixels": 0.031,
+        "cloud_cover": 0.03,
+        "collection": "2",
+        "columns": 7771,
+        "data_type": "L1TP",
+        "epsg_code": 32636,
+        "gsd": 30,
+        "instrument": "OLI_TIRS",
+        "item_type": "Landsat8L1G",
+        "origin_x": 174885,
+        "origin_y": 3632115,
+        "pixel_resolution": 30,
+        "processed": "2021-07-21T08:13:58Z",
+        "product_id": "LC08_L1TP_177038_20210715_20210721_02_T1",
+        "provider": "usgs",
+        "published": "2021-07-21T13:00:06Z",
+        "quality_category": "standard",
+        "rows": 7901,
+        "satellite_id": "Landsat8",
+        "sun_azimuth": 110.6,
+        "sun_elevation": 66.8,
+        "updated": "2021-07-21T13:00:06Z",
+        "usable_data": 0.63,
+        "view_angle": 0,
+        "wrs_path": 177,
+        "wrs_row": 38
+      },
+      "type": "Feature"
+    },
+    {
+      "_links": {
+        "_self": "https://api.planet.com/data/v1/item-types/Landsat8L1G/items/LC81450232021196LGN00",
+        "assets": "https://api.planet.com/data/v1/item-types/Landsat8L1G/items/LC81450232021196LGN00/assets/",
+        "thumbnail": "https://tiles.planet.com/data/v1/item-types/Landsat8L1G/items/LC81450232021196LGN00/thumb"
+      },
+      "_permissions": [
+        "assets.analytic_b1:download",
+        "assets.analytic_b10:download",
+        "assets.analytic_b11:download",
+        "assets.analytic_b2:download",
+        "assets.analytic_b3:download",
+        "assets.analytic_b4:download",
+        "assets.analytic_b5:download",
+        "assets.analytic_b6:download",
+        "assets.analytic_b7:download",
+        "assets.analytic_b8:download",
+        "assets.analytic_b9:download",
+        "assets.metadata_txt:download",
+        "assets.visual:download"
+      ],
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              86.69384938837828,
+              54.17238619469772
+            ],
+            [
+              89.42737042174316,
+              53.70408493533515
+            ],
+            [
+              88.57159844111138,
+              52.01780972853851
+            ],
+            [
+              85.93891535824277,
+              52.47773771900534
+            ],
+            [
+              86.69384938837828,
+              54.17238619469772
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "id": "LC81450232021196LGN00",
+      "properties": {
+        "acquired": "2021-07-15T05:05:48.733523Z",
+        "anomalous_pixels": 0.035,
+        "cloud_cover": 0.135,
+        "collection": "2",
+        "columns": 7911,
+        "data_type": "L1TP",
+        "epsg_code": 32645,
+        "gsd": 30,
+        "instrument": "OLI_TIRS",
+        "item_type": "Landsat8L1G",
+        "origin_x": 425985,
+        "origin_y": 6003315,
+        "pixel_resolution": 30,
+        "processed": "2021-07-21T07:45:26Z",
+        "product_id": "LC08_L1TP_145023_20210715_20210721_02_T1",
+        "provider": "usgs",
+        "published": "2021-07-21T12:59:06Z",
+        "quality_category": "standard",
+        "rows": 8001,
+        "satellite_id": "Landsat8",
+        "sun_azimuth": 150.5,
+        "sun_elevation": 55.7,
+        "updated": "2021-07-21T12:59:06Z",
+        "usable_data": 0.607,
+        "view_angle": 0,
+        "wrs_path": 145,
+        "wrs_row": 23
+      },
+      "type": "Feature"
+    }
+  ],
+  "type": "FeatureCollection"
+}

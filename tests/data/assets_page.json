@@ -1,0 +1,30 @@
+{
+  "analytic": {
+    "_links": {
+      "_self": "https://api.planet.com/data/v1/assets/eyJpIjogIjQ3MzE0MTNfMjEzMzcwN18yMDIxLTA3LTI2XzI0NTMiLCAiYyI6ICJQU09ydGhvVGlsZSIsICJ0IjogImFuYWx5dGljIiwgImN0IjogIml0ZW0tdHlwZSJ9",
+      "activate": "https://api.planet.com/data/v1/assets/eyJpIjogIjQ3MzE0MTNfMjEzMzcwN18yMDIxLTA3LTI2XzI0NTMiLCAiYyI6ICJQU09ydGhvVGlsZSIsICJ0IjogImFuYWx5dGljIiwgImN0IjogIml0ZW0tdHlwZSJ9/activate",
+      "type": "https://api.planet.com/data/v1/asset-types/analytic"
+    },
+    "_permissions": [
+      "download"
+    ],
+    "expires_at": "2021-08-06T04:03:03.512932",
+    "location": "https://api.planet.com/data/v1/download?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJiMGdZeldFU2prdEtGNVpIdG5zVjlKR2lQLWQxU1BtWnVWdGdyR1BteVVZZHlGdXJIOTNrcm5odXRGN2JIVTRRQ3k0LWZjVXlraHZFaXJFZlZxdjhQZz09IiwiZXhwIjoxNjI4MjIyNTgzLCJ0b2tlbl90eXBlIjoidHlwZWQtaXRlbSIsIml0ZW1fdHlwZV9pZCI6IlBTT3J0aG9UaWxlIiwiaXRlbV9pZCI6IjQ3MzE0MTNfMjEzMzcwN18yMDIxLTA3LTI2XzI0NTMiLCJhc3NldF90eXBlIjoiYW5hbHl0aWMifQ.08XDhnHsgc0U3edy31M8M96zd5CDHBgsulV4ARRYU--90c3WvGsJ-Cxflp8gUAtl2LUZhs_ZJ_8l97USEkVlWQ",
+    "md5_digest": "2d605628c5dc7ab88f0aed9f1b7ef1ed",
+    "status": "active",
+    "type": "analytic"
+  },
+  "visual": {
+    "_links": {
+      "_self": "https://api.planet.com/data/v1/assets/eyJpIjogIjQ3MzE0MTNfMjEzMzcwN18yMDIxLTA3LTI2XzI0NTMiLCAiYyI6ICJQU09ydGhvVGlsZSIsICJ0IjogInZpc3VhbCIsICJjdCI6ICJpdGVtLXR5cGUifQ",
+      "activate": "https://api.planet.com/data/v1/assets/eyJpIjogIjQ3MzE0MTNfMjEzMzcwN18yMDIxLTA3LTI2XzI0NTMiLCAiYyI6ICJQU09ydGhvVGlsZSIsICJ0IjogInZpc3VhbCIsICJjdCI6ICJpdGVtLXR5cGUifQ/activate",
+      "type": "https://api.planet.com/data/v1/asset-types/visual"
+    },
+    "_permissions": [
+      "download"
+    ],
+    "md5_digest": null,
+    "status": "inactive",
+    "type": "visual"
+  }
+}

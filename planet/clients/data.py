@@ -18,7 +18,7 @@ import typing
 
 from ._base import _BaseClient
 from .. import exceptions
-from ..models import Items, Item
+from ..models import Asset, Items, Item
 
 LOGGER = logging.getLogger(__name__)
 
@@ -91,4 +91,69 @@ class DataClient(_BaseClient):
         req = self._request(url, method='POST', data=search_body)
         items = Items(req, _request_and_parse, limit=limit)
 
+        # TODO return Items instead of list
         return [i async for i in items]
+
+    async def get_assets(
+        self,
+        item: Item
+    ) -> typing.List[Asset]:
+        url = (self._data_url() +
+               'item-types/' + item.type + '/items/' + item.id)
+        req = self._request(url, method='GET')
+        try:
+            resp = await self._do_request(req)
+        except exceptions.MissingResource as ex:
+            msg_json = json.loads(ex.message)
+            msg = msg_json['general'][0]['message']
+            raise exceptions.MissingResource(msg)
+
+        assets = resp.json()
+        return [Asset(a) for a in assets.values()]
+
+    async def get_asset(
+        self,
+        item: Item,
+        asset_type: str
+    ) -> Asset:
+        raise NotImplementedError
+
+    async def activate(
+        self,
+        asset: Asset,
+    ) -> str:
+        '''Activate an asset.
+
+        Parameters:
+            asset: Asset to activate.
+        '''
+        url = asset.activate_url
+        req = self._request(url, method='GET')
+        try:
+            resp = await self._do_request(req)
+        except exceptions.MissingResource as ex:
+            msg_json = json.loads(ex.message)
+            msg = msg_json['general']['message']
+            raise exceptions.MissingResource(msg)
+
+        assets = resp.json()
+        return [Asset(a) for a in assets]
+
+    async def download(
+        self,
+        asset: Asset,
+    ) -> str:
+        '''Execute a structured item search.
+
+        Parameters:
+            filter: Structured search criteria.
+            item_types: The item types to include in the search.
+            name: The name of the saved search.
+            page_size: Change number of results to return per page from default
+                of 250 to given value (which must be less than 250).
+            sort: Sort according to custom field and direction, instead of
+                'published desc'. Fields are 'acquired' and 'published'.
+                Directions are 'asc' and 'desc'.
+            strict: Strictly remove false positives from geo intersection.
+        '''
+        raise NotImplementedError
