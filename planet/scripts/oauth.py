@@ -7,14 +7,16 @@ from urllib.parse import urlparse, parse_qs, urlencode
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 from webbrowser import open_new
-from .util import generate_nonce, get_claim, duration_human, create_challenge, create_verifier
-
+from .util import generate_nonce, get_user_agent, create_challenge, create_verifier
 
 REDIRECT_URL = 'http://localhost:8080'
 SCOPES = 'openid'
 PORT = 8080
 
-
+# Note: The authorization code flow is unique in that the offline_access scope must
+# be requested as part of the code request to the /authorize endpoint and not the 
+# request sent to the /token endpoint.
+# https://developer.okta.com/docs/guides/refresh-tokens/get-refresh-token/
 def get_access_token_from_code(token_uri, client_id, secret, code, code_verifier):
     """
     Parse the access token from Planet's response
@@ -45,6 +47,7 @@ def get_access_token_from_code(token_uri, client_id, secret, code, code_verifier
     auth_server_url = token_uri + '?' + urlencode(data)
 
     response = requests.post(url=auth_server_url, auth=creds, headers={
+                             'User-Agent': get_user_agent(),
                              'content-type': 'application/x-www-form-urlencoded'})
     return response.json()
 
@@ -104,6 +107,37 @@ class TokenHandler:
         self._secret = config.get('secret')
         self._code_verifier = create_verifier()
 
+    def refresh_tokens(self, refresh_token):
+        """
+        
+        POST /oauth2/default/v1/token HTTP/1.1
+        Accept: application/json
+        Content-Type: application/x-www-form-urlencoded
+
+        grant_type=refresh_token
+        redirect_uri=com.embeddedauth://callback
+        scope=offline_access openid profile
+        refresh_token=03_hBtVj-Hk0Mxo9TPSdl7TLkxQioKqQEzud3ldqHqs
+        client_id=0oa94el1z4nUDxx0z5d7
+        
+        """
+
+
+        data = {
+            'client_id': self._client_id,
+  #          'scope': SCOPES,
+            'redirect_uri': REDIRECT_URL,
+            'grant_type': 'refresh_token',
+            'refresh_token': refresh_token
+        }
+
+        auth_server_url = self.metadata['token_endpoint'] + '?scope=openid%20offline_access&' + urlencode(data)
+
+        response = requests.post(url=auth_server_url, headers={
+                             'User-Agent': get_user_agent(),
+                             'content-type': 'application/x-www-form-urlencoded'})
+        return response.json()
+
     def get_tokens(self):
         """
          Fetches the access key using an HTTP server to handle oAuth
@@ -113,7 +147,6 @@ class TokenHandler:
         data = {
             'client_id': self._client_id,
             'response_type': 'code',
-            'scope': SCOPES,
             'redirect_uri': REDIRECT_URL,
             'state': generate_nonce(),
             'nonce': generate_nonce(10)
@@ -128,7 +161,7 @@ class TokenHandler:
         query_str = urlencode(data)
 
         auth_server_url = self.metadata['authorization_endpoint'] + \
-            '?' + query_str
+            '?scope=openid%20offline_access&' + query_str
 
         open_new(auth_server_url)
 

@@ -34,6 +34,9 @@ from click import termui
 from planet import api
 from planet.api import filters
 
+from planet.api.__version__ import __version__ as version
+import platform
+
 TIME_DURATION_UNITS = (
     ('week', 60*60*24*7),
     ('day', 60*60*24),
@@ -384,6 +387,10 @@ def get_claim(token, claim):
 def generate_nonce(length=8):
     """Generate pseudorandom number."""
     return ''.join([str(random.randint(0, 9)) for i in range(length)])
+
+
+def get_user_agent():
+    return 'Python SDK/{} {}'.format(version, platform.platform())
 
 
 def duration_human(seconds):

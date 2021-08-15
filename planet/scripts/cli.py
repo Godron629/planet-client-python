@@ -117,7 +117,8 @@ def login():
     try:
         tokens = handler.get_tokens()
         if tokens:
-            write_planet_json({'key': tokens['access_token']})
+            expires_on = get_claim(tokens['access_token'], 'exp')
+            write_planet_json({'expires_on': expires_on, 'access_token': tokens['access_token'], 'refresh_token': tokens['refresh_token']})
             click.echo('You are now logged in as [{}]'.format(
                 get_claim(tokens['access_token'], 'sub')))
         else:
