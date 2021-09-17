@@ -582,3 +582,90 @@ class ClientV1(_Base):
         '''
 
         return self._get(location, models.JSON, callback=callback)
+
+    def get_delivery_subscriptions(self):
+        '''Get information for all subscriptions for the current user, including
+        cancelled subscriptions
+
+        :returns: :py:Class:`planet.api.models.PublishingSubscriptions`
+        '''
+        return self._get(
+            self._url('subscriptions/v1/'),
+            models.DeliverySubscriptions
+        ).get_body()
+
+    def get_individual_delivery_subscription(self, subscription_id):
+        '''Get subscription details by ID
+
+        :param subscription_id str: The ID of the Subscription
+        :returns: :py:class:`planet.api.models.JSON`
+        :raises planet.api.exceptions.APIException: On API error.
+        '''
+        return self._get(
+            self._url('subscriptions/v1/{}'.format(subscription_id)),
+            body_type=models.JSON
+        ).get_body()
+
+    def cancel_delivery_subscription(self, subscription_id):
+        '''Cancel a running subscription by subscription ID
+
+        Subscriptions can only be cancelled in Pending or Running State.
+
+        :param subscription_id str: The ID of the Subscription
+        :returns: :py:Class:`planet.api.models.DeliverySubscription`
+        :raises planet.api.exceptions.APIException: On API error.
+        '''
+        return self.dispatcher.response(
+            models.Request(
+                self._url('subscriptions/v1/{}/cancel'.format(subscription_id)),
+                self.auth,
+                body_type=models.Body,
+                method='POST'
+            )
+        ).get_body()
+
+    def create_delivery_subscription(self, request):
+        '''Create a subscription.
+
+        :param request: subscription request
+        :returns: :py:class:`planet.api.models.JSON`
+        :raises planet.api.exceptions.APIException: On API error.
+        '''
+        return self.dispatcher.response(
+            models.Request(
+                self._url('subscriptions/v1/'),
+                self.auth,
+                body_type=models.JSON,
+                data=json.dumps(request),
+                method='POST'
+            )
+        ).get_body()
+
+    def get_delivery_subscription_results(self, subscription_id, status=None, created=None, updated=None,
+                                          completed=None):
+        '''Get results for a given subscription
+
+        :param subscription_id str: Subscription ID
+        :param status str: Enum: "created" "queued" "processing" "failed" "success"
+        :param created str: Only return results that were created in the given interval or instant.
+        :param updated str: Only return results that were updated in the given interval or instant.
+        :param completed str: Only return results that were completed in the given interval or instant.
+        :returns :py:class:`planet.api.models.JSON`
+        :raises planet.api.exceptions.APIException: On API error.
+        '''
+        params = {}
+
+        if status:
+            params['status'] = status
+        if created:
+            params['created'] = created
+        if updated:
+            params['updated'] = updated
+        if completed:
+            params['completed'] = completed
+
+        return self._get(
+            self._url('subscriptions/v1/{}/results'.format(subscription_id)),
+            body_type=models.JSON,
+            params=params,
+        ).get_body()

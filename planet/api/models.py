@@ -325,6 +325,11 @@ class Orders(Paged):
     NEXT_KEY = 'next'
 
 
+class DeliverySubscriptions(Paged):
+    ITEM_KEY = 'subscriptions'
+    NEXT_KEY = 'next'
+
+
 class Order(JSON):
     LINKS_KEY = '_links'
     RESULTS_KEY = 'results'

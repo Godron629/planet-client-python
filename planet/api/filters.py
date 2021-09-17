@@ -36,6 +36,28 @@ def build_search_request(filter_like, item_types, name=None, interval=None):
         req['interval'] = interval
     return req
 
+def build_delivery_subscription_request(filter_like, name, item_types, asset_types, delivery, tools=None):
+    '''Build a subscription-api creation request body for the specified item_types.
+    '''
+    filter_spec = filter_like.get('filter', filter_like)
+    all_items = list(set(filter_like.get('item_types', [])).union(item_types))
+    req = {
+        'name': name,
+        'source': {
+            'type': 'catalog',
+            'parameters': {
+                'item_types': all_items,
+                'asset_types': asset_types,
+                'filter': filter_spec,
+            }
+        },
+        'delivery': delivery,
+    }
+    if tools:
+        req['tools'] = tools
+    return req
+
+
 
 def is_filter_like(filter_like):
     '''Check if the provided dict looks like a search request or filter.'''
@@ -145,7 +167,6 @@ def geom_filter(geom, field_name=None):
     '''
     return _filter('GeometryFilter', config=geom,
                    field_name=field_name or 'geometry')
-
 
 def num_filter(field_name, *vals):
     '''Build a NumberInFilter.
